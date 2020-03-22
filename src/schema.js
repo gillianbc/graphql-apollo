@@ -25,13 +25,13 @@ const typeDefs = gql `
 
     type Mission {
         name: String
-        missionPatch(size: PatchSize): String
+        missionPatch(mission: String, size: PatchSize): String
     }
 
     enum PatchSize { SMALL LARGE }
 
     type Query {
-        launches( # replace the current launches query with this one.
+        launches( 
             """
             The number of results to show. Must be >= 1. Default = 20
             """
