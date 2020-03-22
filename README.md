@@ -6,6 +6,7 @@ I have added extra comments in the code as aide memoires.
 Note that Apollo have given very simple names to the queries:
 - Launch
 - Launches
+
 The expectation is that you give the query a more meaningful name when you use it e.g.
 
 ```
@@ -21,25 +22,7 @@ query GetLaunches {
 }
 ```
 
-To get the next page of data, request the cursor:
-```
-query GetSomeStuff {
-  launches(pageSize: 3, after: "1578363540") {
-    cursor
-    hasMore
-    launches {
-      id
-      mission {
-        name
-        missionPatch
-      }
-    }
-  }
-}
-```
-This will return a numeric string.  Pass this in as the 'after' arg.
-
-## Understanding Apollo's Underscores
+## Understanding Resolver Underscores
 In the resolvers, you will see Apollo using _ and __
 Recall the arguments for any resolver are (parent, args, context, info).
 Info (parsed query information) is rarely used, so it boils down to (parent, args, context)
@@ -76,6 +59,7 @@ i.e. for the first not required param, Apollo use _, for the next not needed par
 Apollo use __ etc.  (Is this Apollo or is this a common JS convention?)
 
 # Appendix
+```
 query GetMe {
   me {
     id
@@ -85,7 +69,8 @@ query GetMe {
     }
   }
 }
-
+```
+```
 query GetSomeStuff {
   launches(pageSize: 3, after: "1578363540") {
     cursor
@@ -99,3 +84,21 @@ query GetSomeStuff {
     }
   }
 }
+```
+To get the next page of data, request the cursor:
+```
+query GetSomeStuff {
+  launches(pageSize: 3, after: "1578363540") {
+    cursor
+    hasMore
+    launches {
+      id
+      mission {
+        name
+        missionPatch
+      }
+    }
+  }
+}
+```
+This will return a numeric string.  Pass this in as the 'after' arg.
