@@ -43,34 +43,37 @@ This will return a numeric string.  Pass this in as the 'after' arg.
 In the resolvers, you will see Apollo using _ and __
 Recall the arguments for any resolver are (parent, args, context, info).
 Info (parsed query information) is rarely used, so it boils down to (parent, args, context)
-`
+
+```
 Launch: {
   isBooked: async (launch, _, { dataSources }) =>
     dataSources.userAPI.isBookedOnLaunch({ launchId: launch.id }),
 },
-`
+```
+
 The way to read the above is:
 - It's a resolver for the Launch type
 - it's for the isBooked field
 - it needs the parent (the details of the launch returned from the database)
-- does not need any args specified by the client
+- does NOT need any args specified by the client, so it's indicated by an _ 
 - from the context, it only needs the datasources
 
-`
+```
 User: {
   trips: async (_, __, { dataSources }) => {
     // get ids of launches by user
     const launchIds = await dataSources.userA...
-`
+```
+
 The way to read the above is:
 - It's a resolver for the User type
 - it's for the trips field
-- does not need the parent (i.e. the user details)
-- does not need any args specified by the client
+- does NOT need the parent (i.e. the user details), so it's indicated by an _ 
+- does NOT need any args specified by the client, so it's indicated by an __
 - from the context, it only needs the datasources
 
 i.e. for the first not required param, Apollo use _, for the next not needed param,
-Apollo use __ etc.
+Apollo use __ etc.  (Is this Apollo or is this a common JS convention?)
 
 # Appendix
 query GetMe {
