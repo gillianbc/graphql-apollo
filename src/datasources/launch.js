@@ -16,7 +16,10 @@ class LaunchAPI extends RESTDataSource {
 
   async getLaunchById({ launchId }) {
     const response = await this.get('launches', { flight_number: launchId });
-    return this.launchReducer(response[0]);
+    console.log('LAUNCH FROM DB' + JSON.stringify(response, null, 2))
+    console.log(response.length > 0)
+    return (response.length ? this.launchReducer(response[0]) : null)
+    
   }
   
   getLaunchesByIds({ launchIds }) {
@@ -24,6 +27,7 @@ class LaunchAPI extends RESTDataSource {
       launchIds.map(launchId => this.getLaunchById({ launchId })),
     );
   }
+
 
   // This is where the work happens of mapping the DB response to the schema fields
   // Note that we are resolving inner types here - mission and rocket

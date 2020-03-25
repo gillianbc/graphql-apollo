@@ -25,6 +25,7 @@ const typeDefs = gql `
 
     type Mission {
         name: String
+        """ The embroidered badge for the Apollo mission.  Derived from the mission returned from the DB and the requested size """
         missionPatch(mission: String, size: PatchSize): String
     }
 

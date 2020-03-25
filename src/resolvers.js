@@ -13,12 +13,8 @@ const {
 
 module.exports = {
     Query: {
-        launches: async (_, {
-            pageSize = 20,
-            after
-        }, {
-            dataSources
-        }) => {
+        //              (parent, args,                   context)
+        launches: async (_, { pageSize = 20, after }, { dataSources }) => {
             const allLaunches = await dataSources.launchAPI.getAllLaunches();
             // we want these in reverse chronological order
             allLaunches.reverse();
@@ -34,8 +30,7 @@ module.exports = {
                 // last item in _all_ results, then there are no more results after this
                 hasMore: launches.length ?
                     launches[launches.length - 1].cursor !==
-                    allLaunches[allLaunches.length - 1].cursor :
-                    false
+                    allLaunches[allLaunches.length - 1].cursor : false
             };
         },
         launch: (_, {
@@ -65,15 +60,16 @@ module.exports = {
         },
     },
     Launch: {
-        isBooked: async (launch, _, {dataSources } ) =>
+        isBooked: async (launch, _, {
+                dataSources
+            }) =>
             dataSources.userAPI.isBookedOnLaunch({
                 launchId: launch.id
             }),
     },
     User: {
-        trips: async (_, __, {
-            dataSources
-        }) => {
+        //           parent, args, context
+        trips: async (_, __, { dataSources }) => {
             // get ids of launches by user
             const launchIds = await dataSources.userAPI.getLaunchIdsByUser();
 
@@ -87,4 +83,44 @@ module.exports = {
             );
         },
     },
+    Mutation: {
+        //           (parent, args, context)
+        login: async (_, { email }, { dataSources } ) => {
+            const user = await dataSources.userAPI.findOrCreateUser({ email });
+            if (user) return Buffer.from(email).toString('base64');
+        },
+        bookTrips: async (_, { launchIds }, { dataSources }) => {
+            const results = await dataSources.userAPI.bookTrips({ launchIds });
+            const launches = await dataSources.launchAPI.getLaunchesByIds({
+              launchIds,
+            });
+        
+            return {
+              success: results && results.length === launchIds.length,
+              message:
+                results.length === launchIds.length
+                  ? 'trips booked successfully'
+                  : `the following launches couldn't be booked: ${launchIds.filter(
+                      id => !results.includes(id),
+                    )}`,
+              launches,
+            };
+          },
+          cancelTrip: async (_, { launchId }, { dataSources }) => {
+            const result = await dataSources.userAPI.cancelTrip({ launchId });
+        
+            if (!result)
+              return {
+                success: false,
+                message: 'failed to cancel trip',
+              };
+        
+            const launch = await dataSources.launchAPI.getLaunchById({ launchId });
+            return {
+              success: true,
+              message: 'trip cancelled',
+              launches: [launch],
+            };
+          }
+    }
 };
